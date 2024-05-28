@@ -13,8 +13,6 @@ model_cfg = dict(
         topk=(1, 5),
     ))
 
-# img_norm_cfg = dict(
-#     mean=[39.86019985, 36.76471982, 35.0101234], std=[48.31014677, 45.52510348, 44.69971612], to_rgb=True)
 img_norm_cfg = dict(
     mean=[40.95984366, 37.61124436, 35.80594691], std=[48.51076895, 45.51812755, 44.62745192], to_rgb=True)
 train_pipeline = [

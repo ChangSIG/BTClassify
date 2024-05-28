@@ -27,19 +27,9 @@ from models.build import BuildNet
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a model')
     parser.add_argument('--config',
-                        # default='models/resnet/resnet50.py',
-                        default='models/shufflenet/shufflenet_v2.py',
-                        # default='logs/HRNet/2023-04-14-18-28-10/hrnet-w64.py',
-                        # default='logs/HRNet/2023-04-14-18-28-10/hrnet-w64-cbam.py',
-                        # default='logs/HRNet/2023-04-14-18-28-10/hrnet-w64-cs.py',
-                        # default='logs/GNN/2023-05-26-17-12-04/gnn-big.py',
-                        # default='logs/GNNAttn/2023-06-13-15-58-39/gnn-attn-big.py',
-                        # default='logs/GNNAttnE/2023-05-26-16-12-03/gnn-attn-e-big.py',
+                        default='models/gnn/gnn-attn-e-big.py',
                         help='train config file path')
     parser.add_argument('--resume-from',
-                        # default='logs/HRNetCBAM/2023-04-22-17-38-45/Val_Epoch097-Acc85.938.pth',
-                        # default='logs/HRNetCBAM/2023-04-22-18-09-20/Val_Epoch126-Acc89.062.pth',
-                        # default='logs/GNN/2023-04-29-01-01-46/Val_Epoch075-Acc72.917.pth',
                         help='the checkpoint file to resume from')
     parser.add_argument('--seed', type=int, default=None, help='random seed')
     parser.add_argument('--device', help='device used for training. (Deprecated)')
@@ -72,8 +62,8 @@ def parse_args():
 
 def main():
     # 读取训练&制作验证标签数据
-    total_annotations = "datas/LW/split2/train.txt"
-    test_annotations = 'datas/LW/split2/test.txt'
+    total_annotations = "data/bt/train.txt"
+    test_annotations = 'data/bt/test.txt'
 
     # 读取配置文件获取关键字段
     args = parse_args()
@@ -111,7 +101,7 @@ def main():
         with open(test_annotations, encoding='utf-8') as f:
             val_datas = f.readlines()
 
-    # 初始化模型,详见https://www.bilibili.com/video/BV12a411772h
+    # 初始化模型
     if args.device is not None:
         device = torch.device(args.device)
     else:
@@ -134,7 +124,7 @@ def main():
     # 初始化学习率更新策略
     lr_update_func = eval(lr_config.pop('type'))(**lr_config)
 
-    # 制作数据集->数据增强&预处理,详见https://www.bilibili.com/video/BV1zY4y167Ju
+    # 制作数据集->数据增强&预处理
     train_dataset = Mydataset(train_datas, train_pipeline)
     val_pipeline = copy.deepcopy(train_pipeline)
     val_dataset = Mydataset(val_datas, val_pipeline)
@@ -176,7 +166,7 @@ def main():
     # 初始化保存训练信息类
     train_history = History(meta['save_dir'])
 
-    # 记录初始学习率，详见https://www.bilibili.com/video/BV1WT4y1q7qN
+    # 记录初始学习率
     lr_update_func.before_run(runner)
 
     # 训练
